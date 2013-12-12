@@ -13,22 +13,24 @@ var poolUsageApp = angular.module('PoolUsage', [])
 
 poolUsageApp.controller("PoolUsageCtrl", function ($rootScope, $http, $templateCache) {
     var apiURL = '/ceph-rest-api/';
-    $http({method: "get", url: apiURL + "df.json", cache: $templateCache}).
-        success(function (data, status) {
-            $rootScope.status = status;
-            $rootScope.data = data;
-            $rootScope.pools = data.output.pools;
-            $rootScope.stats = data.output.stats;
-            var totalUsed = data.output.stats.total_used;
-            var totalSpace = data.output.stats.total_space;
-            $rootScope.percentUsed = totalUsed / totalSpace;
-        }).
-        error(function (data, status) {
-            $rootScope.status = status;
-            $rootScope.pools = data || "Request failed";
-            $rootScope.stats.total_used = "N/A";
-            $rootScope.stats.total_space = "N/A";
-        });
+    setTimeout(function () {
+        $http({method: "get", url: apiURL + "df.json", cache: $templateCache}).
+            success(function (data, status) {
+                $rootScope.status = status;
+                $rootScope.data = data;
+                $rootScope.pools = data.output.pools;
+                $rootScope.stats = data.output.stats;
+                var totalUsed = data.output.stats.total_used;
+                var totalSpace = data.output.stats.total_space;
+                $rootScope.percentUsed = totalUsed / totalSpace;
+            }).
+            error(function (data, status) {
+                $rootScope.status = status;
+                $rootScope.pools = data || "Request failed";
+                $rootScope.stats.total_used = "N/A";
+                $rootScope.stats.total_space = "N/A";
+            });
+    }, 4000);
 });
 
 
@@ -42,7 +44,7 @@ poolUsageApp.directive('myGauge', function () {
         terminal: true,
         scope: {
             value: '=',
-            colormode:  '='
+            colormode: '='
         },
         link: function (scope, element, attrs) {
             //console.log("my gauge enter");
@@ -59,56 +61,92 @@ poolUsageApp.directive('myGauge', function () {
                 .append("g")
                 .attr("transform", "translate(" + width / 2 + "," + height + ")");
 
+
+            //misc
+            function percent_to_angle(percent) {
+                return (-(Math.PI / 2.0) + (Math.PI * percent));
+            }
+
+            var colorFunc;
+            //console.log(attrs.colormode);
+            if (attrs.colormode == 'asc') {
+                colorFunc = color4ascPercent;
+            }
+            else {
+                colorFunc = color4descPercent;
+            }
+
+            function arcTween(b) {
+                var i = d3.interpolate({value: b.previous}, b);
+                return function(t) {
+                    return arc(i(t));
+                };
+            }
+
+            // clear the elements inside of the directive
+            svg.selectAll('*').remove();
+
+            var fields = [
+                {value: 1, color: "#cccccc", name: "fond"},
+                {value: 0, color: "#00FF00", name: "na"}
+            ];
+
+            fields[0].previous = fields[0].value = 1;
+
+            var arc = d3.svg.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius)
+                .startAngle(-Math.PI / 2)
+                .endAngle(function (d) {
+                    return d.value * Math.PI - Math.PI / 2;
+                });
+
+
             scope.$watch('value', function (percentValue, oldPercentValue) {
 
-                //misc
-                function percent_to_angle(percent) {
-                    return (-(Math.PI / 2.0) + (Math.PI * percent));
-                }
-
-                var colorFunc;
-                //console.log(attrs.colormode);
-                if (attrs.colormode=='asc'){colorFunc = color4ascPercent;}
-                else {colorFunc = color4descPercent;}
-
-                // clear the elements inside of the directive
-                svg.selectAll('*').remove();
                 // if 'percentUsed' is undefined, exit
                 if (!percentValue) {
                     return;
                 }
 
-                //available
-                var arc = d3.svg.arc()
-                    .innerRadius(innerRadius)
-                    .outerRadius(outerRadius)
-                    .startAngle(percent_to_angle(0.0))
-                    .endAngle(percent_to_angle(1.0))
+                fields[1].previous = fields[1].value;
+                fields[1].value = percentValue;
 
-                svg.append("path")
-                    .attr("d", arc)
-                    .attr("fill", "#dddddd");
+                var path = svg.selectAll("path")
+                    .data(fields)
+                    .attr("fill", function (d) {
+                        if (d.name == "fond")return d.color; else return colorFunc(d.value);
+                    });
+                path.enter().append("svg:path");
+                path.transition()
+                    .ease("linear")
+                    .duration(1500)
+                    .attrTween("d", arcTween)
+                    .style("fill", function (d) {
+                        if (d.name == "fond")return d.color; else return colorFunc(d.value);
+                    });
 
-
-                //used
-                arc = d3.svg.arc()
-                    .innerRadius(innerRadius)
-                    .outerRadius(outerRadius)
-                    .startAngle(percent_to_angle(0))
-                    .endAngle(percent_to_angle(percentValue));
-
-                var myarc = svg.append("path")
-                    .attr("d", arc)
-                    .attr("fill", colorFunc(percentValue))
-                    .datum({endAngle: percent_to_angle(percentValue)})
-
-                //pourcentage au centre
-                svg.append("text")
-                    .text((percentValue * 100).toFixed(1) + " %")
+                svg.selectAll("text").remove();
+                var gaugeText = svg.selectAll("text")
+                    .data([fields[1]])
+                    .enter()
+                    .append("text")
+                    .text(function(d){return (d.value*100).toFixed(1) + " %";})
                     .attr("text-anchor", "middle")
                     .attr("font-size", "30px")
                     .attr("font-family", "arial")
+                    .transition()
+                    .duration(1500)
+                    .tween("text", function(d) {
+                        var i = d3.interpolate(d.previous, d.value);
+                        return function(t) {
+                            this.textContent = (i(t)*100).toFixed(1) + " %";
+                        };
+                    });
+
             });
+
+
         }
     }
 
