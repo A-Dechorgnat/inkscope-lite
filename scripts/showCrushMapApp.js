@@ -75,8 +75,21 @@ showCrushMapApp.directive('myTopology', function () {
         },
         link: function (scope, element, attrs) {
 
-            var width = 500,
-                height = 500,
+
+            function description(d){
+                var html="";
+                html+="<h2>"+ d.name+"</h2>"
+                html+="id : "+ d.id+"<br />"
+                html+="weight : "+ d.weight+"<br />"
+                if(typeof d.hash !== "undefined"){html+="hash : "+ d.hash+"<br />"}
+                if(typeof d.alg !== "undefined"){html+="alg : "+ d.alg+"<br />"}
+                if(typeof d.type_name !== "undefined"){html+="type : "+ d.type_name+"<br />"}
+                if(typeof d.pos !== "undefined"){html+="pos : "+ d.pos+"<br />"}
+                return html;
+            }
+
+            var width = 800,
+                height = 800,
                 radius = Math.min(width, height) / 2 - 10;
 
             var x = d3.scale.linear()
@@ -93,6 +106,8 @@ showCrushMapApp.directive('myTopology', function () {
                 .attr("height", height)
                 .append("g")
                 .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 10) + ")");
+
+            var divTooltip =  d3.select("body").select("#tooltip");
 
             scope.$watch('values', function (root, oldRoot) {
 
@@ -114,7 +129,21 @@ showCrushMapApp.directive('myTopology', function () {
 
                 var g = svg.selectAll("g")
                     .data(partition.nodes(root))
-                    .enter().append("g");
+                    .enter().append("g")
+                    .on("click", click)
+                    .on("mouseover", function (d) {
+                        divTooltip.transition()
+                            .duration(1000)
+                            .style("opacity", .9);
+                        divTooltip.html(description(d))
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px")/**/;
+                    })
+                    .on("mouseout", function (d) {
+                        divTooltip.transition()
+                            .duration(1000)
+                            .style("opacity", 0);
+                    });
 
                 var path = g.append("path")
                     .attr("d", arc)
@@ -122,7 +151,6 @@ showCrushMapApp.directive('myTopology', function () {
                     .style("fill", function (d) {
                         return color4ascPercent(d.dispo);
                     })
-                    .on("click", click)
                     .style("stroke", "#fff")
                     .style("stroke-width", "1");
 
