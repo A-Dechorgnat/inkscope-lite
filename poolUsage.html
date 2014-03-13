@@ -3,6 +3,7 @@
 <head>
     <meta charset=utf-8 />
     <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular-misc/D3Directives.js"></script>
     <script src="scripts/poolUsageApp.js"></script>
     <script src="scripts/d3/d3.v3.min.js"></script>
     <script src="scripts/d3/common.js"></script>
@@ -14,13 +15,13 @@
 <body  ng-controller="PoolUsageCtrl">
 
 
-<h1><a href="#"><img src="img/ceph.jpg" width="160" border="=0"></a> usage</h1>
+<h1><a href="index.html"><img src="img/ceph.jpg" width="160" border="=0"></a> usage</h1>
 
 <div id="graph">
     <h3>Total space usage</h3>
-    <my-gauge value="percentUsed" colormode="desc"></my-gauge>
+    <ad-gauge value="percentUsed" colormode="desc" width="300"></ad-gauge>
     <div class="gaugeLegend">
-        {{stats.total_used | bytes:MB}} used <br>on {{stats.total_space | bytes:MB}}
+        {{stats.total_used | bytes:kB}} used <br>on {{stats.total_space | bytes:kB}}
     </div>
 </div>
 

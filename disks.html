@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html ng-app="DisksApp">
+<head>
+    <meta charset=utf-8 />
+    <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular-misc/D3Directives.js"></script>
+    <script src="scripts/disksApp.js"></script>
+    <script src="scripts/d3/d3.v3.min.js"></script>
+    <script src="scripts/d3/common.js"></script>
+    <script src="scripts/d3/colorbrewer.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/testAdmin.css">
+    <title>Disks</title>
+</head>
+<body ng-controller="DisksCtrl">
+<h1>Ceph Disks</h1>
+<div id="list">
+    <table  class="table table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Description</th>
+            <th>Size</th>
+            <th>Manufacturer</th>
+            <th>Version</th>
+            <th>Serial number</th>
+            <th>Physical id</th>
+            <th>Bus info</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="disk in disks">
+            <td>{{disk._id}}</td>
+            <td>{{disk.description}}</td>
+            <td>{{disk.size}}</td>
+            <td>{{disk.manufacturer}}</td>
+            <td>{{disk.version}}</td>
+            <td>{{disk.serial_number}}</td>
+            <td>{{disk.physical_id}}</td>
+            <td>{{disk.bus_info}}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table  class="table table-condensed table-hover">
+        <thead>
+        <tr>
+            <th ng-repeat="key in keys">
+                {{key}}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="disk in disks">
+            <td ng-repeat="key in keys">{{ disk[key]}}</td>
+        </tr>
+        </tbody>
+        </table>
+</div>
+
+</body>
+</html>

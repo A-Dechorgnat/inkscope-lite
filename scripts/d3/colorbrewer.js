@@ -1,5 +1,9 @@
 // This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
-var colorbrewer = {YlGn: {
+
+var colorbrewer = {GnYlRd: {
+9:["#035600","#058a01","#0ad600","#92d600","#d6d600","#ff8c00","#d62800","#950000","#4e0101"]
+},
+YlGn: {
 3: ["#f7fcb9","#addd8e","#31a354"],
 4: ["#ffffcc","#c2e699","#78c679","#238443"],
 5: ["#ffffcc","#c2e699","#78c679","#31a354","#006837"],

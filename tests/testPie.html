@@ -1,0 +1,76 @@
+<!doctype html>
+<html ng-app="testPie">
+<head>
+    <meta charset=utf-8/>
+    <script src="../scripts/angular/angular.min.js"></script>
+    <script src="../scripts/angular-misc/D3Directives.js"></script>
+    <script src="../scripts/d3/d3.v3.min.js"></script>
+    <script src="../scripts/d3/common.js"></script>
+    <script src="../scripts/d3/colorbrewer.js"></script>
+    <script src="../scripts/d3/nv.d3.js"></script>
+
+    <script>
+        var testPie = angular.module('testPie', ['D3Directives'])
+                .controller("testPieCtrl", function ($scope) {
+
+                    $scope.data01 = [
+                        {"val": 40, "label": "label 1"},
+                        {"val": 80, "label": "label 2"}
+                    ];
+
+                    $scope.data02 = [
+                        {"count": 2001, "state_name": "label 1"},
+                        {"count": 5008, "state_name": "label 2"},
+                        {"count": 3025, "state_name": "label 3"}
+                    ];
+                    $scope.data03 = [
+                        {"count": 0, "state_name": "label 0"},
+                        {"count": 10, "state_name": "label 1"},
+                        {"count": 20, "state_name": "label 2"},
+                        {"count": 50, "state_name": "label 3"},
+                        {"count": 30, "state_name": "label 4"},
+                        {"count": 5, "state_name": "label 5"},
+                        {"count": 3, "state_name": "label 6"},
+                        {"count": 80, "state_name": "label 7"}
+                    ];
+
+                    randomData();
+
+                    setInterval(function(){randomData();},5*1000);
+
+                    function randomData(){
+                        $scope.randomdata = [
+                            {"count": Math.random(), "state_name": "label 0"},
+                            {"count": Math.random(), "state_name": "label 1"},
+                            {"count": Math.random(), "state_name": "label 2"}
+                        ];
+                        $scope.$apply();
+                    }
+                });
+    </script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../css/nv.d3.css"/>
+    <link rel="../stylesheet" href="../css/bootstrap.min.css">
+    <link rel="../stylesheet" href="../css/testAdmin.css">
+    <title>Pie tests</title>
+</head>
+<body ng-controller="testPieCtrl">
+
+
+<h1>Pie tests</h1>
+<style>.pieContainer {float:left;}</style>
+<div class="pieContainer">
+    <ad-pie value="data01" width="250" id="pie01" labelfield="label" valuefield="val"></ad-pie>
+</div>
+<div class="pieContainer">
+    <ad-pie value="data02" width="250" id="pie02" labelfield="state_name" valuefield="count"></ad-pie>
+</div>
+<div class="pieContainer">
+    <ad-pie value="data03" width="250" id="pie03" labelfield="state_name" valuefield="count"></ad-pie>
+</div>
+<div class="pieContainer">
+    <ad-pie value="randomdata" width="250" id="pieRamdom" labelfield="state_name" valuefield="count"></ad-pie>
+</div>
+
+
+</body>
+</html>

@@ -1,20 +1,21 @@
-a.tooltips {
+.tooltips {
     position: relative;
     display: inline;
 }
-a.tooltips span {
+.tooltips span {
+    font: 12px Arial, Helvetica, sans-serif;
     position: absolute;
-    width:140px;
-    color: #04007A;
-    background: #FDFFD1;
-    height: 45px;
-    line-height: 45px;
-    text-align: center;
+    width:160px;
+    color: black;
+    text-align: left;
+    background: lightgoldenrodyellow;
+    /*height: 45px;*/
     visibility: hidden;
-    border-radius: 0px;
+    border-radius: 5px;
+    padding: 5px;
     box-shadow: 1px 1px 2px ;
 }
-a.tooltips span:after {
+.tooltips span:after {
     content: '';
     position: absolute;
     top: 100%;
@@ -25,9 +26,9 @@ a.tooltips span:after {
     border-right: 8px solid transparent;
     border-left: 8px solid transparent;
 }
-a:hover.tooltips span {
+:hover.tooltips span {
     visibility: visible;
-    opacity: 0.8;
+    opacity: 0.9;
     bottom: 30px;
     left: 50%;
     margin-left: -76px;

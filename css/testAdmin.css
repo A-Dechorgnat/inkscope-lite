@@ -72,6 +72,97 @@ label {
  }
 
 
+.health_status {
+    height: 40px;width: 40px;border:solid 1px black;
+    float:left;
+    margin:10px;
+}
+.health_status_HEALTH_OK {background-color: limegreen}
+.health_status_HEALTH_WARN {background-color: darkorange}
+.health_status_HEALTH_ERR {background-color: red}
+.health_status_HEALTH_UNKNOWN {background-color: lightgrey}
+
+.health_summary{
+    font-size:20px;
+    font-weight: bold;
+    color:white;
+    text-align: center;
+    width:90%;
+    padding: 20px 10px;
+    border-radius: 10px;
+    margin:20px 10px;
+}
+/* Mon status */
+#general_status, #mon_status {
+    clear:both;
+    width:850px;
+    min-height: 110px;
+}
+
+
+.osd {
+    height: 45px;width: 100px;
+    text-align: center;
+    color:#ffffff;
+    font-size:20px;
+    font-weight: bold;
+    margin:20px;
+    padding-top:20px;
+    border-radius: 10px;
+}
+
+.quorum_in, .quorum_out {
+    height: 25px; min-width: 80px;
+    text-align: center;
+    color:#ffffff;
+    font-size:20px;
+    font-weight: bold;
+    float:left;
+    margin:10px;
+    padding-top:5px;
+}
+.quorum_in {
+    border:solid 10px limegreen;border-radius: 15px;
+}
+.quorum_out {
+    border:solid 10px lightgray;border-radius: 15px;
+}
+
+
+#pg_status_graph {
+    width:350px;
+    height: 370px;
+    margin-right: 10px;
+    background-color: white;
+    float : left;
+}
+#pg_status_details {
+    float:left;
+    font-size :16px;
+    font-weight: bold;
+}
+#general_status, #mon_status, #pg_status, #osd_status {
+    border:solid 1px gray;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 1em;
+    float:left;
+}
+#pg_status {
+    clear:both;
+    width:650px;
+    height: 400px;
+}
+#osd_status {
+    width:150px;
+    height: 400px;
+}
+#osd_status_details {
+    margin-top:60px;
+    font-size :16px;
+    font-weight: bold;
+}
+
 /* D3 visualization */
 
 .gaugeLegend{

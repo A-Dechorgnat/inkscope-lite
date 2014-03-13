@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html ng-app="OsdsApp">
+<head>
+    <meta charset=utf-8 />
+    <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular-misc/D3Directives.js"></script>
+    <script src="scripts/osdsApp.js"></script>
+    <script src="scripts/d3/d3.v3.min.js"></script>
+    <script src="scripts/d3/common.js"></script>
+    <script src="scripts/d3/colorbrewer.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/testAdmin.css">
+    <title>Osds</title>
+    <style>
+        .osd {
+            float:left;
+            width:40px;
+            height:40px;
+            line-height: 40px;
+            margin: 5px;
+            padding: 0px;
+            border-radius: 26px;
+            color:black;
+            vertical-align:middle;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .osd_in {
+            border: solid 4px limegreen;
+        }
+        .osd_out {
+            border: solid 4px red;
+        }
+        .osd_up {
+            background-color : limegreen;
+        }
+        .osd_down {
+            background-color : darkorange;;
+        }
+
+    </style>
+
+</head>
+<body ng-controller="OsdsCtrl">
+<h1>Ceph Osds</h1>
+<div  ng-repeat="osd in data" class="osd  {{osdClass(osd.stat.in,osd.stat.up)}}">
+    {{osd.node._id}}
+</div>
+<div  ng-repeat="osd in data" class="osd  {{osdClass(true,false)}}">
+    {{osd.node._id*10}}
+</div>
+<div  ng-repeat="osd in data" class="osd  {{osdClass(false,false)}}">
+    {{osd.node._id+10}}
+</div>
+<div  ng-repeat="osd in data" class="osd  {{osdClass(false,true)}}">
+    {{osd.node._id*58}}
+</div>
+
+
+</body>
+</html>

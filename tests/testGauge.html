@@ -1,0 +1,116 @@
+<!doctype html>
+<html ng-app="testGauge">
+<head>
+    <meta charset=utf-8/>
+    <script src="../scripts/angular/angular.min.js"></script>
+    <script src="../scripts/angular-misc/D3Directives.js"></script>
+    <script src="../scripts/d3/d3.v3.min.js"></script>
+    <script src="../scripts/d3/common.js"></script>
+    <script src="../scripts/d3/colorbrewer.js"></script>
+    <script>
+        angular.module('testGauge', ['D3Directives'])
+                .controller("testGaugeCtrl", function ($scope) {
+                    $scope.randomvalue = 0.5;
+                    $scope.randomvalue2 = 0.5;
+                    setInterval(function () {
+                        var val = Math.random();
+                        console.log(val);
+                        $scope.randomvalue = val;
+                        $scope.randomvalue2 = (2*val)-0.5;
+                        $scope.$digest();
+                    }, 3000);
+                });
+    </script>
+    <link rel="../stylesheet" href="css/bootstrap.min.css">
+    <link rel="../stylesheet" href="css/testAdmin.css">
+    <title>Gauge tests</title>
+</head>
+<body ng-controller="testGaugeCtrl">
+
+<h1>Gauge tests</h1>
+
+<div id="graph">
+    <h2>Default attributes</h2>
+    <ad-gauge value="randomvalue" colormode="desc" width="40" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="desc" width="50" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="desc" width="60" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="desc" width="70" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="desc" width="80" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="desc" width="90" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="desc" width="100" type="plain"></ad-gauge>
+    <ad-gauge value="randomvalue" width="110"></ad-gauge>
+    <ad-gauge value="randomvalue" width="120"></ad-gauge>
+    <ad-gauge value="randomvalue" width="130"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="asc" width="140"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="asc" width="160"></ad-gauge>
+    <ad-gauge value="randomvalue" colormode="asc" width="170"></ad-gauge>
+    <br clear="all">
+    <h2>Desc color function</h2>
+    <ad-gauge value="0.0" colormode="desc" width="80"></ad-gauge>
+    <ad-gauge value="0.1" colormode="desc" width="100"></ad-gauge>
+    <ad-gauge value="0.2" colormode="desc" width="120"></ad-gauge>
+    <ad-gauge value="0.3" colormode="desc" width="140"></ad-gauge>
+    <ad-gauge value="0.4" colormode="desc" width="160"></ad-gauge>
+    <ad-gauge value="0.5" colormode="desc" width="180"></ad-gauge>
+    <ad-gauge value="0.6" colormode="desc" width="200"></ad-gauge>
+    <ad-gauge value="0.7" colormode="desc" width="220"></ad-gauge>
+    <ad-gauge value="0.8" colormode="desc" width="240"></ad-gauge>
+    <ad-gauge value="0.9" colormode="desc" width="260"></ad-gauge>
+    <ad-gauge value="1.0" colormode="desc" width="280"></ad-gauge>
+    <br clear="all">
+    <h2>Asc color function</h2>
+    <ad-gauge value="0.0" colormode="asc" width="80"></ad-gauge>
+    <ad-gauge value="0.1" colormode="asc" width="100"></ad-gauge>
+    <ad-gauge value="0.2" colormode="asc" width="120"></ad-gauge>
+    <ad-gauge value="0.3" colormode="asc" width="140"></ad-gauge>
+    <ad-gauge value="0.4" colormode="asc" width="160"></ad-gauge>
+    <ad-gauge value="0.5" colormode="asc" width="180"></ad-gauge>
+    <ad-gauge value="0.6" colormode="asc" width="200"></ad-gauge>
+    <ad-gauge value="0.7" colormode="asc" width="220"></ad-gauge>
+    <ad-gauge value="0.8" colormode="asc" width="240"></ad-gauge>
+    <ad-gauge value="0.9" colormode="asc" width="260"></ad-gauge>
+    <ad-gauge value="1.0" colormode="asc" width="280"></ad-gauge>
+    <br clear="all">
+    <br clear="all">
+    <h2>Color functions control</h2>
+    <ad-gauge value="0.00" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.05" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.15" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.25" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.35" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.45" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.55" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.65" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.75" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.85" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="0.95" colormode="desc" width="150"></ad-gauge>
+    <ad-gauge value="1.0" colormode="desc" width="150"></ad-gauge>
+    <br clear="all">
+    <ad-gauge value="1.00" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.95" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.85" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.75" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.65" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.55" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.45" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.35" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.25" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.15" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.05" colormode="asc" width="150"></ad-gauge>
+    <ad-gauge value="0.0" colormode="asc" width="150"></ad-gauge>
+    <br clear="all">
+    <h2>Invalid values and changing values</h2>
+    value = -0.05
+    <ad-gauge value="-0.05" colormode="asc" width="200"></ad-gauge>
+    value = 2.0
+    <ad-gauge value="2.0" colormode="asc" width="200"></ad-gauge>
+    random
+    <ad-gauge value="randomvalue" colormode="desc" width="200"></ad-gauge>
+    random with invalid values ({{randomvalue2.toFixed(3)}})
+    <ad-gauge value="randomvalue2" colormode="desc" width="200"></ad-gauge>
+
+</div>
+
+</body>
+</html>
