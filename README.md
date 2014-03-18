@@ -1,12 +1,14 @@
 inkScope-lite
 =============
 
-InkScope lite is a simplified version of [inkScope](https://github.com/inkscope/inkscope), a Ceph admin user interface.
+InkScope-lite is a simplified version of [inkScope](https://github.com/inkscope/inkscope), a Ceph admin user interface.
 
-It only uses the ceph-rest-api to communicate with Ceph.
+It allows only visualization of a Ceph cluster.
+
+It doesn't use probe or database but only the ceph-rest-api to communicate with Ceph.
 
 # prequisites
-Inkscope needs [Apache 2](http://httpd.apache.org/)
+Inkscope needs [Apache 2](http://httpd.apache.org/) et a running ceph-rest-api on the Ceph cluster.
 
 Download all the directories of the inkScope-lite project to a folder of your choice
 
