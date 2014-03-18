@@ -57,10 +57,10 @@ body {
 }
 
 a {
-  color: #2879d0;
+  color: #29b05d;
 }
 a:hover {
-  color: #2268b2;
+  color: #23924e;
 }
 
 header {
@@ -68,8 +68,8 @@ header {
   padding-top: 10px;
   padding-bottom: 40px;
   font-family: 'Helvetica Neue', Helvetica, Arial, serif;
-  background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;
-  border-bottom: solid 1px #275da1;
+  background: #35ac45 url(../images/header-bg.jpg) 0 0 repeat-x;
+  border-bottom: solid 1px #246844;
 }
 
 header h1 {
@@ -83,7 +83,7 @@ header h1 {
 
 header h2 {
   font-size: 26px;
-  color: #9ddcff;
+  color: #91ff79;
   font-weight: normal;
   line-height: 1.3;
   width: 540px;
@@ -179,7 +179,7 @@ pre {
   border: solid 1px #f2f2f2;
 }
 pre code {
-  color: #2879d0;
+  color: #23a75c;
   background-color: #fff;
   border: none;
   padding: 0;
@@ -234,7 +234,7 @@ form {
 
 #main-content h1:before {
   content: "/";
-  color: #9ddcff;
+  color: #91ff79;
   padding-right: 0.3em;
   margin-left: -0.9em;
 }
@@ -248,7 +248,7 @@ form {
 } 
 #main-content h2:before {
   content: "//";
-  color: #9ddcff;
+  color: #91ff79;
   padding-right: 0.3em;
   margin-left: -1.5em;
 }
@@ -264,7 +264,7 @@ form {
  
 #main-content h3:before {
   content: "///";
-  color: #9ddcff;
+  color: #91ff79;
   padding-right: 0.3em;
   margin-left: -2em;
 }
@@ -278,7 +278,7 @@ form {
 
 h4:before {
   content: "////";
-  color: #9ddcff;
+  color: #91ff79;
   padding-right: 0.3em;
   margin-left: -2.8em;
 }
@@ -290,7 +290,7 @@ h4:before {
 } 
 h5:before {
   content: "/////";
-  color: #9ddcff;
+  color: #91ff79;
   padding-right: 0.3em;
   margin-left: -3.2em;
 }
@@ -302,7 +302,7 @@ h5:before {
 } 
 h6:before {
   content: "//////";
-  color: #9ddcff;
+  color: #91ff79;
   padding-right: 0.3em;
   margin-left: -3.7em;
 }
@@ -436,8 +436,8 @@ footer a:hover {
     text-align: center;
     font-size: 13px;
     line-height: 1;
-    background-color: #9ddcff;
-    color: #2879d0;
+    background-color: #91ff79;
+    color: #29b05d;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;                     
     border-radius: 5px;    
