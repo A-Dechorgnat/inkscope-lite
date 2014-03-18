@@ -77,3 +77,12 @@ Apache V2 is already installed
 
     No need to restart Apache
 
+#Screenshots
+
+![dashboard](img/ScreenShot-dashboard.png)
+
+![pools](img/ScreenShot-pool.png)
+
+![pgs](img/ScreenShot-pg.png)
+
+![crushmap](img/ScreenShot-crushmap.png)
