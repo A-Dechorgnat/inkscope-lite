@@ -5,6 +5,14 @@ var showCrushMapApp = angular.module('showCrushMapApp', ['components']);
 
 
 showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $scope, $http, $templateCache) {
+
+    var w = window, d = document, e = d.documentElement, g = d.getElementsByTagName('body')[0];
+    $scope.screenSize ={"x" : w.innerWidth || e.clientWidth || g.clientWidth , "y" : w.innerHeight || e.clientHeight || g.clientHeight};
+
+    var svg = d3.select("body").select("#put_the_graph_there")
+        .attr("width", $scope.screenSize.x -40)
+        .attr("height", $scope.screenSize.y -200);
+
     var apiURL = '/ceph-rest-api/';
     $http({method: "get", url: apiURL + "osd/crush/dump.json", cache: $templateCache}).
         success(function (data, status) {
@@ -39,7 +47,7 @@ showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $sc
         var buckets = bucketsTab[-1];
 
         function addChildren(bucket) {
-            bucket.dispo = 1.0;
+            bucket.dispo = -1.0;
             bucket.children = [];
             for (var j = 0; j < bucket.items.length; j++) {
                 var item = bucket.items[j];
@@ -50,7 +58,7 @@ showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $sc
                 else {
                     var osd = item;
                     osd.name = osdTab[item.id];
-                    osd.dispo = 1.0;
+                    osd.dispo = -1.0;
                     bucket.children.push(osd);
                 }
             }
@@ -88,8 +96,11 @@ showCrushMapApp.directive('myTopology', function () {
                 return html;
             }
 
-            var width = 800,
-                height = 800,
+            var w = window, d = document, e = d.documentElement, g = d.getElementsByTagName('body')[0];
+            scope.screenSize ={"x" : w.innerWidth || e.clientWidth || g.clientWidth , "y" : w.innerHeight || e.clientHeight || g.clientHeight};
+
+            var width  = scope.screenSize.x -40,
+                height = scope.screenSize.y -200,
                 radius = Math.min(width, height) / 2 - 10;
 
             var x = d3.scale.linear()
@@ -147,6 +158,7 @@ showCrushMapApp.directive('myTopology', function () {
 
                 var path = g.append("path")
                     .attr("d", arc)
+                    .attr("id",function(d){return "path"+ d.name;})
                     //.style("fill", function(d) { return color((d.children ? d : d.parent).name); })
                     .style("fill", function (d) {
                         return color4ascPercent(d.dispo);
@@ -163,7 +175,7 @@ showCrushMapApp.directive('myTopology', function () {
                     })
                     .attr("dx", "6") // margin
                     .attr("dy", ".35em") // vertical-align
-                    .style("fill", "#fff")
+                    .style("fill", "#000")
                     .text(function (d) {
                         return d.name;
                     });

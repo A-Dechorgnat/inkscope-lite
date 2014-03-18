@@ -12,14 +12,14 @@
     <title>Ceph Crush map</title>
 </head>
 <body>
-<h1><a href="index.html"><img src="img/ceph.jpg" width="160" border="=0"></a> crush map</h1>
+<h1 class="pageTitle"><a href="index.html"><img src="img/inkscope_logo100.png" boredr="0"></a> Ceph crush map</h1>
 <br/>
 
 <div ng-controller="CrushMapCtrl" style="margin:0 20px">
     <tabs>
         <pane title="Topology">
             <div id="tooltip"></div>
-            <div id="put_the_graph_there" style="width: 100%;height: 600px;border:solid 1px #ffffff;">
+            <div id="put_the_graph_there" style="width:100%">
                 <my-topology values="buckets"></my-topology>
             </div>
             <!--script src="scripts/crushMapTopology.js"></script>

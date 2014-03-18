@@ -5,11 +5,30 @@
     background-color: #78FA89;
 }
 
+h1.pageTitle {
+    font-size:45px;
+}
+h1.pageTitle img {
+    margin:5px 10px ;
+}
+
 input, textarea {
     /*déjà en inline-block*/
     width: 150px;
     padding: 4px;
     vertical-align: top;
+}
+
+.clickable{
+    cursor: pointer;
+}
+
+.text-warning{
+    color:darkorange;
+}
+
+.text-error{
+    color:red;
 }
 
 #sujet {
@@ -20,8 +39,8 @@ input, textarea {
     position:absolute;
     opacity:0;
     background-color: lightyellow;
-    width:150px;
-    height:150px;
+    min-width:150px;
+    min-height:150px;
     border:solid gray 1px;
     border-radius: 10px;
     padding:10px;
@@ -67,7 +86,7 @@ label {
 #list{
      margin : 2em;
      float:left;
-     width :250px;
+     width :350px;
      padding: 1em;
  }
 
@@ -87,39 +106,67 @@ label {
     font-weight: bold;
     color:white;
     text-align: center;
-    width:90%;
-    padding: 20px 10px;
+    vertical-align: middle;
+    width:100%;
+    height:45px;
+    line-height:45px;
     border-radius: 10px;
-    margin:20px 10px;
+    margin:20px auto;
 }
 /* Mon status */
-#general_status, #mon_status {
+#general_status, .general_status, #mon_status {
     clear:both;
     width:850px;
-    min-height: 110px;
+    min-height:80px;
+    display:block;
 }
 
 
-.osd {
-    height: 45px;width: 100px;
+.mybadge {
+    width: 50px;
+    height: 40px;
+    line-height:40px;
     text-align: center;
     color:#ffffff;
     font-size:20px;
     font-weight: bold;
-    margin:20px;
-    padding-top:20px;
+    margin:5px;
     border-radius: 10px;
+    cursor: pointer;
+}
+
+.filter{
+    float: left;
+    background-color: lightblue;
+    padding: 0px 5px 3px 5px;
+    margin : 10px;
+    min-width: 40px;
+    border-radius: 3px;
+}
+.notfilter{
+    border:1px solid lightgrey;
+    border-radius: 3px;
+    color:lightgrey;
+    float: left;
+    background-color: white;
+    padding: 0px 5px 3px 5px;
+    margin : 10px;
+    min-width: 40px;
 }
 
 .quorum_in, .quorum_out {
-    height: 25px; min-width: 80px;
+    height: 25px;
+    line-height: 25px;
+    min-width: 80px;
     text-align: center;
+    vertical-align: middle;
     color:#ffffff;
     font-size:20px;
     font-weight: bold;
     float:left;
-    margin:10px;
-    padding-top:5px;
+    margin:0px;
+    margin-right: 10px;
+
 }
 .quorum_in {
     border:solid 10px limegreen;border-radius: 15px;
@@ -130,45 +177,95 @@ label {
 
 
 #pg_status_graph {
-    width:350px;
-    height: 370px;
+    width:320px;
+    height: 340px;
     margin-right: 10px;
     background-color: white;
     float : left;
 }
-#pg_status_details {
+#capacity_details {
     float:left;
     font-size :16px;
     font-weight: bold;
 }
-#general_status, #mon_status, #pg_status, #osd_status {
+#general_status, #mon_status, #pg_status, #osd_status, #pool_status, #mds_status,.general_status, #capacity_details {
     border:solid 1px gray;
     border-radius: 10px;
-    margin: 10px;
+    margin: 5px;
     padding: 1em;
     float:left;
 }
 #pg_status {
     clear:both;
-    width:650px;
-    height: 400px;
+    width:340px;
+    height: 370px;
 }
-#osd_status {
+#osd_status{
     width:150px;
-    height: 400px;
 }
 #osd_status_details {
-    margin-top:60px;
+    margin-top:10px;
     font-size :16px;
     font-weight: bold;
 }
+#osd_status_details table{
+text-align: center;
+}
+#osd_status_details td{
+    text-align: center;
+}
+#pool_status{
+    width:150px;
+}
+#pool_status_details {
+    margin-top:10px;
+    font-size :16px;
+    font-weight: bold;
+}
+#pool_status_details td{
+    text-align: center;
+}
+#mds_status{
+    width:150px;
+}
+#mds_status_details {
+    margin-top:10px;
+    font-size :16px;
+    font-weight: bold;
+}
+#mds_status_details td{
+    text-align: center;
+}
 
+#journal{
+    border:solid 1px gray;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 3px;
+    float:right;
+    width:750px;
+    height: 35px;
+    overflow: auto;
+}
+
+
+#datePanel, #filters{
+    margin:10px;
+    font-weight: bold;
+    clear:both;
+}
+#datePanel, #filters .title {
+    font-size:large;
+}
 /* D3 visualization */
 
 .gaugeLegend{
     margin-top:1em;
     width: 100%;
     text-align: center;
+}
+.gaugeLegend a , .gaugeLegend a:hover, .gaugeLegend a:visited{
+    text-decoration: none;
 }
 
 
@@ -281,4 +378,70 @@ label {
 }
 * html #cssmenu ul {
     height: 1%;
+}
+
+#osds, #probes {
+    margin: 10px 200px 10px 50px ;
+    clear:both;
+}
+
+.osd {
+    font-size: 18px;
+    font-weight: bold;
+    float: left;
+    min-width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 5px;
+    padding: 0px;
+    border-radius: 26px;
+    color: white;
+    vertical-align: middle;
+    text-align: center;
+    vertical-align: middle;
+    cursor:pointer;
+}
+
+
+.osd_in {
+    border: solid 4px limegreen;
+}
+
+.osd_out {
+    border: solid 4px darkorange;
+}
+
+.osd_up {
+    background-color: limegreen;
+}
+
+.osd_down {
+    background-color: red;
+}
+
+.probe {
+    font-size: 18px;
+    font-weight: bold;
+    float: left;
+    min-width: 40px;
+    min-height: 40px;
+    line-height: 40px;
+    margin: 5px;
+    padding: 0px 10px;
+    border-radius: 26px;
+    color: white;
+    vertical-align: middle;
+    text-align: center;
+    vertical-align: middle;
+    cursor:pointer;
+}
+
+.probe_OK {
+    background-color: limegreen;
+}
+.probe_WARN {
+    background-color: darkorange;
+}
+.probe_ERROR {
+    background-color: red;;
 }

@@ -9,19 +9,27 @@
     <![endif]-->
 </head>
 <body>
-<div id='cssmenu'>
+
+<a href='status.html'><img src="img/inkscope_logo.png" style="border: none;float:left;margin :10px" title="go to dashboard" alt="go to dashboard"></a>
+
+<div style="float:left;margin :10px">
+
+    <strong>Inkscope-lite</strong> provides different visualizations of a Ceph cluster:
+
     <ul>
-        <li class='has-sub last'><a href='#'><span>Menu</span></a>
-            <ul>
-                <li><a href='status.html'><span>Ceph status</span></a></li>
-                <li><a href='poolUsage.html'><span>pool usage</span></a></li>
-                <li><a href='poolManagement.html'><span>pool management</span></a></li>
-                <li><a href='poolspgsosds.html'><span>pools / pgs / osds</span></a></li>
-                <li class='last'><a href='showCrushMap.html'><span>crush map</span></a></li>
-            </ul>
-        </li>
+        <li><a href='status.html'><span>Ceph status</span></a>: a ceph -s equivalent </li>
+        <li><a href='poolUsage.html'><span>Pool usage</span></a>: some pools statistics</li>
+        <li><a href='poolspgsosds.html'><span>Pools / pgs / osds</span></a>: shows relationship between pools and osds</li>
+        <li><a href='showCrushMap.html'><span>Crush map</span> </a>: a partial visualization of the Crush Map</li>
     </ul>
+    <br />
+    <!--Other visualizations:
+    <ul>
+        <li><a href='objectLookup.html'><span>Object lookup</span></a>: shows on which OSD is or would be stored an object in a pool</li>
+        <li>More coming soon...</li>
+    </ul-->
 </div>
+
 
 </body>
 </html>

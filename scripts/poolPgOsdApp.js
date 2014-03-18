@@ -7,14 +7,34 @@ var PoolPgOsdApp = angular.module('PoolPgOsdApp', []);
 PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache) {
     var apiURL = '/ceph-rest-api/';
 
-    //refresh data every x seconds
+    var w = window, d = document, e = d.documentElement, g = d.getElementsByTagName('body')[0];
+    $scope.screenSize = {"x": w.innerWidth || e.clientWidth || g.clientWidth, "y": w.innerHeight || e.clientHeight || g.clientHeight};
+
+    var svg = d3.select("#chart2")
+        .attr("width", $scope.screenSize.x - 40)
+        .attr("height", $scope.screenSize.y - 170);
+
     refreshData();
-    //setInterval(function () {
-    //  refreshData()
-    //}, 30*1000);
+
+
+    //refresh data every x seconds
+    var myTimer;
+
+    $scope.changePeriod = function(){
+        console.log("new period : " + $scope.refreshPeriod);
+        if ($scope.refreshPeriod<=1) {
+            window.clearInterval(myTimer);
+            return;
+        }
+        window.clearInterval(myTimer);
+        myTimer = setInterval(function () {
+            refreshData()
+        }, $scope.refreshPeriod * 1000);
+    }
+
 
     function refreshData() {
-
+        $scope.date = new Date();
         $http({method: "get", url: apiURL + "pg/stat.json"})
             .success(function (data, status) {
                 var nodeUid = 0;
@@ -23,9 +43,11 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
 
                 $http({method: "get", url: apiURL + "osd/dump.json"})
                     .success(function (data, status) {
-                        var network = {};
-                        network.nodes = [];
-                        network.links = [];
+                        /*
+                         var network = {};
+                         network.nodes = [];
+                         network.links = [];
+                         */
 
                         var network2 = {};
                         network2.nodes = [];
@@ -39,12 +61,16 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
                             poolTab[pool.pool] = {};
                             poolTab[pool.pool].name = pool.pool_name;
                             poolTab[pool.pool].index = nodeUid;
-                            network.nodes[nodeUid] = {};
-                            network.nodes[nodeUid].name = pool.pool_name;
-                            network.nodes[nodeUid].type = "pool";
+                            poolTab[pool.pool].nbpg = 0;
+                            /*
+                             network.nodes[nodeUid] = {};
+                             network.nodes[nodeUid].name = pool.pool_name;
+                             network.nodes[nodeUid].type = "pool";
+                             */
                             network2.nodes[nodeUid] = {};
                             network2.nodes[nodeUid].name = pool.pool_name;
                             network2.nodes[nodeUid].type = "pool";
+                            network2.nodes[nodeUid].nbpg = 0;
                             nodeUid++;
                         }
                         var osds = data.output.osds;
@@ -54,14 +80,17 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
                             osdTab[osd.osd] = {};
                             osdTab[osd.osd].osd = osd;
                             osdTab[osd.osd].index = nodeUid;
-                            network.nodes[nodeUid] = {};
-                            network.nodes[nodeUid].name = "osd." + osd.osd;
-                            network.nodes[nodeUid].states = osd.state;
-                            network.nodes[nodeUid].type = "osd";
+                            /*
+                             network.nodes[nodeUid] = {};
+                             network.nodes[nodeUid].name = "osd." + osd.osd;
+                             network.nodes[nodeUid].states = osd.state;
+                             network.nodes[nodeUid].type = "osd";
+                             */
                             network2.nodes[nodeUid] = {};
                             network2.nodes[nodeUid].name = "osd." + osd.osd;
                             network2.nodes[nodeUid].states = osd.state;
                             network2.nodes[nodeUid].type = "osd";
+                            network2.nodes[nodeUid].in = osd.in + 1;//non zero value
                             nodeUid++;
                         }
 
@@ -69,28 +98,36 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
                             var pg = pg_stats[i];
                             var currentNodeUid = nodeUid;
                             nodeUid++;
-                            network.nodes[currentNodeUid] = {};
-                            network.nodes[currentNodeUid].name = "pg " + pg.pgid;
-                            network.nodes[currentNodeUid].states = pg.state.split('+');
-                            network.nodes[currentNodeUid].type = "pg";
+                            /*network.nodes[currentNodeUid] = {};
+                             network.nodes[currentNodeUid].name = "pg " + pg.pgid;
+                             network.nodes[currentNodeUid].states = pg.state.split('+');
+                             network.nodes[currentNodeUid].type = "pg";
+                             */
+
                             var elem = pg.pgid.split('.');
                             var poolId = elem[0];
 
-                            // link from pool to pg
-                            var link = {};
-                            link.source = poolTab[poolId].index;
-                            link.target = currentNodeUid;
-                            link.value = 1.0;
-                            network.links.push(link);
+                            network2.nodes[poolTab[poolId].index].nbpg++;
 
-                            // links from pg to acting osds
-                            for (var j=0; j< pg.acting.length; j++){
-                                var osd  = pg.acting[j];
-                                var link = {};
-                                link.source = currentNodeUid;
-                                link.target = osdTab[osd].index;
-                                link.value = 1.0;
-                                network.links.push(link);
+                            /* link from pool to pg
+                             var link = {};
+                             link.source = poolTab[poolId].index;
+                             link.target = currentNodeUid;
+                             link.value = 1.0;
+                             link.states = ["clean"];
+                             network.links.push(link);
+                             */
+
+                            for (var j = 0; j < pg.acting.length; j++) {
+                                var osd = pg.acting[j];
+                                // links from pg to acting osds
+                                //var link = {};
+                                //link.source = currentNodeUid;
+                                //link.target = osdTab[osd].index;
+                                //link.value = 1.0;
+                                //link.states = pg.state.split('+');
+                                //network.links.push(link);
+
                                 // direct link from pool to osd
                                 var link = {};
                                 link.source = poolTab[poolId].index;
@@ -103,16 +140,16 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
 
                         }
                         //trace(network,"#chart1");
-                        trace(network2,"#chart2");
+                        trace(network2, "#chart2");
 
                     });
             });
     };
 
-    function trace(network , id) {
-        var margin = {top: 1, right: 1, bottom: 6, left: 1},
-            width = 1800 - margin.left - margin.right,
-            height = 950 - margin.top - margin.bottom;
+    function trace(network, id) {
+        var margin = {top: 0, right: 20, bottom: 10, left: 20},
+            width = $scope.screenSize.x - 40 - margin.left - margin.right,
+            height = $scope.screenSize.y - 180 - margin.top - margin.bottom;
 
         var formatNumber = d3.format(",.0f"),
             format = function (d) {
@@ -120,7 +157,10 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
             },
             color = d3.scale.category20();
 
+        d3.select("#myViz").remove();
+
         var svg = d3.select(id).append("svg")
+            .attr("id", "myViz")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -146,7 +186,9 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
             .style("stroke-width", function (d) {
                 return Math.max(1, d.dy);
             })
-            .style("stroke", function (d) { return color4states(d.states);})
+            .style("stroke", function (d) {
+                return color4states(d.states);
+            })
             .sort(function (a, b) {
                 return b.dy - a.dy;
             });
@@ -174,25 +216,28 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
 
         node.append("rect")
             .attr("height", function (d) {
-                if (d.dy<5)return 5;
+                if (d.dy < 5)return 5;
                 return d.dy;
             })
             .attr("width", sankey.nodeWidth())
             .style("fill", function (d) {
                 if (!d.states) return  d.color = color(d.name.replace(/ .*/, ""));
-                if (d.states.indexOf("up")<0) return "red";
+                if (d.states.indexOf("up") < 0) return "red";
                 else return "green";
                 ;
             })
             .style("stroke", function (d) {
+                if (d.in == 1) return "red";
                 return d3.rgb(d.color).darker(2);
             })
             .append("title")
             .text(function (d) {
                 if (d.type == "osd")
-                return d.name + "\n" + format(d.value);
+                    return d.name + "\n" + format(d.value) + "\n" + (d.in == 1 ? "out" : "in");
+                else if (d.type == "pool")
+                    return d.name + "\n" + d.nbpg + " pgs";
                 else
-                return d.name + "\n" + d.value +" osds";
+                    return d.name + "\n";
             });
 
         node.append("text")
@@ -205,9 +250,11 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $templateCache
             .attr("transform", null)
             .text(function (d) {
                 if (d.type == "osd")
-                    return d.name + "\n" + format(d.value);
+                    return d.name + " (" + d.value + " pgs)";
+                else if (d.type == "pool")
+                    return d.name + "\n";
                 else
-                    return d.name + "\n" + d.value +" osds";
+                    return d.name + "\n";
             })
             .filter(function (d) {
                 return d.x < width / 2;
