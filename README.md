@@ -44,14 +44,6 @@ Apache V2 is already installed
                 Require all granted
             </Directory>
 
-            ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
-            <Directory "/usr/lib/cgi-bin">
-                AllowOverride None
-                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
-                Order allow,deny
-                Allow from all
-            </Directory>
-
             ErrorLog ${APACHE_LOG_DIR}/error.log
 
             # Possible values include: debug, info, notice, warn, error, crit,
