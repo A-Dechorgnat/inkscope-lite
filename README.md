@@ -72,7 +72,8 @@ Apache V2 is already installed
 #Screenshots
 
 ![dashboard](img/ScreenShot-dashboard.png)
-![dashboard2](img/ScreenShot-dashboard2.png)
+
+![health details](img/ScreenShot-healthdetails.png)
 
 ![pools](img/ScreenShot-pool.png)
 
