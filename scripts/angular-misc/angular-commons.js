@@ -1,6 +1,7 @@
 /**
  * Created by Alain Dechorgnat on 1/14/14.
  */
+var inkscopeCtrlURL = '/inkscopeCtrl/';
 var cephRestApiURL = '/ceph-rest-api/';
 
 
@@ -19,6 +20,7 @@ function funcBytesFilter () {
 
 function funcDurationFilter(){
     return function (duration){
+        if (duration == "-") return "not available"
         var sign= (duration >=0 ? "":"- ");
         duration = Math.abs(Math.floor(duration));
         var minutes = Math.floor(duration / 60);
@@ -33,3 +35,59 @@ function funcDurationFilter(){
         return sign+days+"d "+str;
     }
 }
+
+function resizeBlocks(blockNames){
+    var height = window.innerHeight-250;
+    for(var i= 0; i < blockNames.length; i++){
+    var block = document.querySelector(blockNames[i]);
+    //console.log(blockNames[i]);
+    block.style.maxHeight = height+"px";
+    }
+}
+
+function getMenu(){
+    var navList = angular.module('navList', []);
+
+    navList.controller('navCtrl', ['$scope', '$location', function ($scope, $location) {
+        $scope.navClass = function (page) {
+            var currentRoute = $location.path().substring(1) || 'home';
+            return page === currentRoute ? 'active' : '';
+        };
+    }]);
+}
+
+
+angular.module('InkscopeCommons', ['ngTable','dialogs','ui.bootstrap'])
+    .controller('overallStatusCtrl', function ($rootScope, $scope,$http) {
+        refreshData();
+        setInterval(function () {
+            refreshData()
+        }, 10 * 1000)
+        function refreshData(){
+            $http({method: "get", url: cephRestApiURL + "status.json",timeout:4000})
+            .success(function (data) {
+                $rootScope.fsid = data.output.fsid;
+                $scope.overallStatus = {};
+                $scope.overallStatus.severity = data.output.health.overall_status;
+                $scope.overallStatus.summary="";
+                var i = 0;
+                while(typeof data.output.health.summary[i] !== "undefined"){
+                    if ($scope.overallStatus.summary!="") $scope.overallStatus.summary+=" | ";
+                    $scope.overallStatus.summary += data.output.health.summary[i].summary;
+                    i++;
+                    }
+                if ($scope.overallStatus.summary==""){
+                    if (data.output.health.detail[0])
+                    $scope.overallStatus.summary = data.output.health.detail[0];
+                    else
+                    //remove HEALTH_ in severity
+                    $scope.overallStatus.summary = $scope.overallStatus.severity.substring(7);
+                    }
+                })
+            .error(function (data) {
+                $scope.overallStatus = {};
+                $scope.overallStatus.severity = "HEALTH_WARN";
+                $scope.overallStatus.summary = "Status not available";
+                });
+        }
+});

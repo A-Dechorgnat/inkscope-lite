@@ -1,7 +1,7 @@
 /**
  * Created by arid6405 on 12/1/13.
  */
-var showCrushMapApp = angular.module('showCrushMapApp', ['components']);
+var showCrushMapApp = angular.module('showCrushMapApp', ['components','InkscopeCommons']);
 
 
 showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $scope, $http, $templateCache) {
@@ -16,25 +16,67 @@ showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $sc
     var apiURL = '/ceph-rest-api/';
     $http({method: "get", url: apiURL + "osd/crush/dump.json", cache: $templateCache}).
         success(function (data, status) {
+            $rootScope.raw = JSON.stringify(data.output,null,"   ");
             $rootScope.status = status;
             $rootScope.rules = data.output.rules;
             $rootScope.types = data.output.types;
             $rootScope.devices = data.output.devices;
             $rootScope.tunables = data.output.tunables;
-            $rootScope.buckets = computeBucketsTree(data.output.buckets);
+            $rootScope.rawbuckets = data.output.buckets;
+
+            $scope.findRoots(data.output.buckets);
+
+            $scope.base = $scope.rootTab[0].id;
+            $rootScope.buckets = $scope.computeBucketsTree(data.output.buckets , $scope.base);
         }).
         error(function (data, status) {
             $rootScope.status = status;
         });
 
     $scope.getType = function (id) {
-        for (var i = 0; i < $rootScope.types.length; i++) {
-            if ($rootScope.types[i].type_id == id) return $rootScope.types[i].name;
-        }
+        if (id==1) return "replicated";
+        if (id==2) return "raid-4";
+        if (id==3) return "erasure";
         return "N/A";
     }
 
-    function computeBucketsTree(rawbuckets) {
+    $scope.showStep = function (step) {
+        return prettyPrint(step);
+    }
+
+
+    $scope.findRoots = function (rawbuckets) {
+        var bucketsTab = [];
+        var osdTab = [];
+
+        for (var i = 0; i < rawbuckets.length; i++) {
+            rawbuckets[i].childrenName =[];
+            bucketsTab[rawbuckets[i].id] = rawbuckets[i];
+            bucketsTab[rawbuckets[i].id].hasParent = false;
+
+        }
+        for (var i = 0; i < $rootScope.devices.length; i++) {
+            osdTab[$rootScope.devices[i].id] = $rootScope.devices[i].name;
+        }
+        for (var i = 0; i < rawbuckets.length; i++) {
+            var bucket = rawbuckets[i];
+            for (var j= 0; j <bucket.items.length; j++){
+                if (bucket.items[j].id<0) {
+                    bucketsTab[bucket.items[j].id].hasParent = true;
+                    rawbuckets[i].childrenName.push(bucketsTab[bucket.items[j].id].name);
+                } else {
+                    rawbuckets[i].childrenName.push(osdTab[bucket.items[j].id]);
+                }
+            }
+            rawbuckets[i].childrenName.sort();
+        }
+        $scope.rootTab = [];
+        for (var i = 0; i < rawbuckets.length; i++) {
+            if ( ! bucketsTab[rawbuckets[i].id].hasParent) $scope.rootTab.push(bucketsTab[rawbuckets[i].id]);
+        }
+    }
+
+    $scope.computeBucketsTree = function (rawbuckets , base) {
         var bucketsTab = [];
         var osdTab = [];
 
@@ -44,8 +86,6 @@ showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $sc
         for (var i = 0; i < $rootScope.devices.length; i++) {
             osdTab[$rootScope.devices[i].id] = $rootScope.devices[i].name;
         }
-        var buckets = bucketsTab[-1];
-
         function addChildren(bucket) {
             bucket.dispo = -1.0;
             bucket.children = [];
@@ -64,12 +104,30 @@ showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $sc
             }
         }
 
+        var buckets = bucketsTab[base];
         addChildren(buckets);
 
 
         return buckets;
     }
 
+    $scope.prettifyStep = function(step){
+        if (step.op == "take")
+            return "take "+ $scope.getBucketForId(step.item).name;
+        if (step.op == "emit")
+            return "emit";
+        var txtStep = step.op.replace("_"," ") +" "+ step.num;
+        if (typeof step.type !== "undefined")
+            txtStep +=" type "+ step.type;
+        return txtStep;
+
+    }
+
+    $scope.getBucketForId= function(id){
+        for (var i = 0; i < $scope.rawbuckets.length; i++) {
+            if ( $scope.rawbuckets[i].id == id) return $scope.rawbuckets[i];
+        }
+    }
 });
 
 
@@ -122,9 +180,12 @@ showCrushMapApp.directive('myTopology', function () {
 
             scope.$watch('values', function (root, oldRoot) {
 
+                // values is $scope.buckets
+
                 // clear the elements inside of the directive
                 svg.selectAll('*').remove();
-                // if 'percentUsed' is undefined, exit
+
+                // if 'root' is undefined, exit
                 if (!root) {
                     return;
                 }

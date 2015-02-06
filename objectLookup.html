@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html ng-app="ObjectLookupApp">
+<head>
+    <meta charset=utf-8/>
+    <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular/angular-sanitize.min.js"></script>
+    <script src="scripts/angular-misc/ng-table.min.js"></script>
+    <script src="scripts/angular-misc/angular-commons.js"></script>
+    <script src="scripts/angular-misc/ui-bootstrap-tpls-0.10.0.min.js"></script>
+    <script src="scripts/angular-misc/dialogs.v2.min.js"></script>
+    <script src="scripts/angular-misc/D3Directives.js"></script>
+    <script src="scripts/objectLookupApp.js"></script>
+    <script src="scripts/d3/d3.v3.min.js"></script>
+    <script src="scripts/d3/common.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/tooltip.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/testAdmin.css">
+    <title>Object Lookup</title>
+</head>
+<body ng-controller="ObjectLookupCtrl">
+
+<header ng-include src="'partials/header.html'" ng-init="pageTitle='Ceph Object Lookup'"></header>
+
+    <div class="general_status">
+        <h2>Selection</h2>
+        <br>
+        Pool:
+        <select id="pool" ng-model="pool" >
+            <option ng-repeat="pool in pools" value="{{ pool.name }}" >{{ pool.name }}</option>
+        </select>
+        Object id:
+        <input type="text" ng-model="objectId" name="objectId" placeholder="object id">
+    </div>
+
+
+<div class="general_status">
+   <h3>Date : {{date | date:'HH:mm:ss'}}</h3>
+    <table  class="table table-condensed" style="width:300px;align-self: center">
+        <tr><td>Pool</td><td>{{pool}}</td></tr>
+        <tr><td>Object</td><td>{{objectId}}</td></tr>
+        <tr><td>PG</td><td>{{data.pgid}}</td></tr>
+        <tr><td>acting</td><td>{{data.acting}}</td></tr>
+        <tr><td>up</td><td>{{data.up}}</td></tr>
+    </table>
+   <div id="osds">
+        <h3>Acting OSD :</h3>
+        <div ng-repeat="osd in acting track by $index" class=" tooltips osd {{osdClassForId(osd)}}" >
+            {{osd}}
+            <div ng-hide="osd==-1"> <!-- tooltip -->
+                <span>
+                    <strong>osd.{{osd}}</strong><br>
+                    {{osdState(getOsd(osd).stat.in,getOsd(osd).stat.up)}}<br>
+                    <br>
+                    weight : {{getOsd(osd).weight}}<br>
+                    public addr : {{getOsd(osd).public_addr}}<br>
+                    cluster addr : {{getOsd(osd).cluster_addr}}<br>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

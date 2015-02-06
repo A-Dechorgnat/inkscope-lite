@@ -2,15 +2,13 @@
  * Created by Alain Dechorgnat on 12/13/13.
  */
 
-var StatusApp = angular.module('StatusApp', ['D3Directives','ngCookies','ngAnimate'])
+var StatusApp = angular.module('StatusApp', ['D3Directives','ngCookies','ngAnimate','InkscopeCommons'])
     .filter('bytes', funcBytesFilter)
     .filter('duration', funcDurationFilter);
 
-StatusApp.controller("statusCtrl", function ($scope, $http , $cookieStore) {
-    var apiURL = '/ceph-rest-api/';
+StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookieStore) {
     $scope.journal = [];
     $scope.osdControl =0;
-    //refresh data every x seconds
 
     $scope.viewControlPanel = false;
     $scope.viewMonitorModule = testAndSetCookie('viewMonitorModule',true);
@@ -29,30 +27,118 @@ StatusApp.controller("statusCtrl", function ($scope, $http , $cookieStore) {
         return value;
     }
 
+    // instantiate our graph!
+    var graph = new Rickshaw.Graph( {
+        element: document.getElementById("iopschart"),
+        width: 300,
+        height: 30,
+        renderer: 'line',
+        series: new Rickshaw.Series.FixedDuration([{ name: 'read' },{ name: 'write' },{ name: 'recovery' }], undefined, {
+            timeInterval: 3000,
+            maxDataPoints: 100,
+            timeBase: new Date().getTime() / 1000
+        })
+    } );
+    var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+        graph: graph,
+        xFormatter: function(x) { return  ""; },
+        yFormatter: function(y) { return  funcBytes(y)+ "/s" ;}
+    } );
+    var yAxis = new Rickshaw.Graph.Axis.Y({
+        graph: graph,
+        height: 30,
+        orientation: 'left',
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('y_axis')
+    });
+    yAxis.render();
+    graph.render();
+
+    //refresh data every x seconds
     refreshData();
+    refreshPGData();
     setInterval(function () {
         refreshData()
-    }, 3 * 1000);
+    }, 5 * 1000);
+    setInterval(function () {
+        refreshPGData()
+    }, 10 * 1000);
+
+
+     function refreshPGData() {
+        $scope.date = new Date();
+        $http({method: "get", url: cephRestApiURL + "pg/stat.json",timeout:8000})
+            .success(function (data, status) {
+                var nodeUid = 0;
+                // fetching pg list and relation with osd
+                var pg_stats = data.output.pg_stats;
+
+                var nbPools = data.output.pool_stats.length;
+                var pools = [];
+                for (var i = 0; i < nbPools; i++) {
+                    pools[data.output.pool_stats[i].poolid] = true;
+                }
+                for (var i = 0; i < pg_stats.length; i++) {
+                    var pg = pg_stats[i];
+                    //console.log(pg.pgid + " : " + pg.state)
+                    if (pg.state != "active+clean") {
+                        //console.log("unclean : " + pg.pgid + " : " + pg.state)
+                        var numPool = pg.pgid.split(".")[0];
+                        pools[numPool] = false;
+                    }
+                }
+
+                $scope.cleanPools = 0;
+                for (var i in pools) {
+                    if (pools[i] == true) $scope.cleanPools++;
+                }
+                $scope.uncleanPools = nbPools - $scope.cleanPools;
+                $scope.pools = nbPools;
+            });
+    };
+
 
     function refreshData() {
         //console.log("refreshing data...");
         $scope.date = new Date();
-        $http({method: "get", url: apiURL + "status.json"})
+        $http({method: "get", url: cephRestApiURL + "status.json",timeout:4000})
             .success(function (data) {
                 $scope.pgmap = data.output.pgmap;
+                if ( typeof  data.output.pgmap.degraded_objects === "undefined" ) $scope.pgmap.degraded_objects=0;
+
+
                 $scope.mdsmap = data.output.mdsmap;
+                $scope.mdsmap.up_standby = data.output.mdsmap["up:standby"];
                 $scope.percentUsed = $scope.pgmap.bytes_used / $scope.pgmap.bytes_total;
                 $scope.pgsByState = $scope.pgmap.pgs_by_state;
 
+                $scope.read = (data.output.pgmap.read_bytes_sec ? data.output.pgmap.read_bytes_sec : 0);
+                $scope.write = (data.output.pgmap.write_bytes_sec ? data.output.pgmap.write_bytes_sec : 0);
+                $scope.recovery = (data.output.pgmap.recovering_bytes_per_sec ? data.output.pgmap.recovering_bytes_per_sec : 0);
+
+                var iopsdata = { read: $scope.read , write : $scope.write , recovery : $scope.recovery };
+                graph.series.addData(iopsdata);
+                yAxis.render();
+                graph.render();
+
                 $scope.health = {};
                 $scope.health.severity = data.output.health.overall_status;
-                if (data.output.health.summary[0])
-                    $scope.health.summary = data.output.health.summary[0].summary;
-                else if (data.output.health.detail[0])
-                    $scope.health.summary = data.output.health.detail[0];
-                else
-                    $scope.health.summary = "OK";
-
+                // there may be several messages under data.output.health.summary
+                $scope.health.summary="";
+                var i = 0;
+                while(typeof data.output.health.summary[i] !== "undefined"){
+                    if ($scope.health.summary!="") $scope.health.summary+=" | ";
+                    $scope.health.summary += data.output.health.summary[i].summary;
+                    i++;
+                }
+                if ($scope.health.summary==""){
+                    if (data.output.health.detail[0])
+                        $scope.health.summary = data.output.health.detail[0];
+                    else
+                        //remove HEALTH_ in severity
+                        $scope.health.summary = $scope.health.severity.substring(7);
+                }
+                $rootScope.healthSeverity = $scope.health.severity;
                 historise();
 
                 $scope.mons = data.output.monmap.mons;
@@ -92,7 +178,8 @@ StatusApp.controller("statusCtrl", function ($scope, $http , $cookieStore) {
                 function healthCompare(h1,h2){
                     if ((h1 == "HEALTH_ERROR")||(h2 == "HEALTH_ERROR")) return "HEALTH_ERROR";
                     if ((h1 == "HEALTH_WARN")||(h2 == "HEALTH_WARN")) return "HEALTH_WARN";
-                    return h1;
+                    if ((h1 == "HEALTH_OK")||(h2 == "HEALTH_OK")) return "HEALTH_OK";
+                    return "HEALTH_UNKNOWN";
                 }
 
                 var osdmap = data.output.osdmap.osdmap;
@@ -122,17 +209,71 @@ StatusApp.controller("statusCtrl", function ($scope, $http , $cookieStore) {
         $scope[module]=view;
     }
 
+    $scope.getPgmapMessage=function(){
+        if (typeof  $scope.pgmap ==="undefined") return "";
+        if ((typeof  $scope.pgmap.degraded_objects ==="undefined" )||($scope.pgmap.degraded_objects==0)) return "";
+        return $scope.pgmap.degraded_objects +" objects degraded on "+$scope.pgmap.degraded_total +" ("+ $scope.pgmap.degraded_ratio +"%)";
+    }
+
     function historise() {
         if ($scope.last_health_summary + "" == "undefined") {
             $scope.last_health_summary = $scope.health.summary;
-            $scope.journal.push({"date": new Date(), "summary": $scope.health.summary});
+            $scope.journal.unshift({"date": new Date(), "summary": $scope.health.summary});
             return;
         }
         if ($scope.last_health_summary != $scope.health.summary) {
-            $scope.journal.push({"date": new Date(), "summary": $scope.health.summary});
+            $scope.journal.unshift({"date": new Date(), "summary": $scope.health.summary});
             $scope.last_health_summary = $scope.health.summary;
         }
     }
 
+});
+
+StatusApp.controller('ModalDemoCtrl', function ($scope, $modal, $log) {
+    $scope.open = function (size) {
+
+        var modalInstance = $modal.open({
+            templateUrl: 'myModalContent.html',
+            controller: 'ModalInstanceCtrl',
+            size: size
+        });
+
+        modalInstance.result.then(function (selectedItem) {
+            $scope.selected = selectedItem;
+        }, function () {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+});
+
+// Please note that $modalInstance represents a modal window (instance) dependency.
+// It is not the same as the $modal service used above.
+
+StatusApp.controller('ModalInstanceCtrl', function ($scope, $modalInstance, $http) {
+    $scope.refresh = function () {
+        $scope.details = ["fetching details ..."];
+        $http({method: "get", url: cephRestApiURL + "health.json?detail",timeout:8000})
+            .success(function (data, status) {
+                $scope.details = data.output.detail;
+                for (var i=0;i<$scope.details.length;i++){
+                    var txt = $scope.details[i];
+                    /([0-9]+\.[0-9a-f]+)/.exec(txt);
+                    var pgid = RegExp.$1;
+                    if (pgid != null)
+                        //$scope.details[i] = txt.replace(pgid,"<a href='pg.html?pgid="+pgid+"'>"+pgid+"</a>");
+                        $scope.details[i] = txt.replace("pg "+pgid,"<a href='../ceph-rest-api/tell/"+pgid+"/query.json'>pg "+pgid+"</a>");
+                    // ceph-rest-api/tell/<pgid>/query.json
+                }
+            })
+            .error(function (data, status) {
+                $scope.details = ["details not available"];
+            }
+        );
+    };
+    $scope.refresh();
+
+    $scope.close = function () {
+        $modalInstance.dismiss('cancel');
+    };
 });
 

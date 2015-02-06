@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html ng-app="OsdsApp">
+<head>
+    <meta charset=utf-8/>
+    <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular/angular-sanitize.min.js"></script>
+    <script src="scripts/angular-misc/ng-table.min.js"></script>
+    <script src="scripts/angular-misc/angular-commons.js"></script>
+    <script src="scripts/angular-misc/ui-bootstrap-tpls-0.10.0.min.js"></script>
+    <script src="scripts/angular-misc/dialogs.v2.min.js"></script>
+    <script src="scripts/angular-misc/D3Directives.js"></script>
+    <script src="scripts/osdsApp.js"></script>
+    <script src="scripts/d3/d3.v3.min.js"></script>
+    <script src="scripts/d3/common.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/tooltip.css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/testAdmin.css">
+    <title>Osds</title>
+    <style>
+        #controlPanel0 {
+            border: black solid 1px;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            margin: 10px;
+            border-radius: 5px;
+            vertical-align: middle;
+            line-height: 40px;
+            padding: 5px;
+        }
+
+        #controlPanel1 {
+            border: black solid 1px;
+            position: fixed;
+            top: 150px;
+            right: 0px;
+            margin: 10px;
+            border-radius: 5px;
+            vertical-align: middle;
+            padding: 5px;
+            background-color: white;
+        }
+
+        #controlPanel0 input[type=number],
+        #controlPanel1  input[type=number] {
+            width: 40px;
+        }
+    </style>
+
+</head>
+<body ng-controller="OsdsCtrl">
+
+<header ng-include src="'partials/header.html'" ng-init="pageTitle='Ceph OSD status'"></header>
+
+<div id="controlPanel1" ng-hide="count == 0">
+    <div class="osd  {{osdClass(osd)}}" style="float:right">
+        {{osd.id}}
+    </div>
+    <h1>{{osd.node.name}}</h1>
+    <strong>{{osdState(osd)}}</strong>
+    <br><br><br><br>
+    weight : {{osd.weight}}<br>
+    public addr : {{osd.public_addr}}<br>
+    cluster addr : {{osd.cluster_addr}}<br>
+</div>
+
+<div id="filters" >
+    <div class="title">Filters</div>
+    <div class="filter clickable" ng-hide="!inFilter"  ng-click="removeFilter('in')"> x in</div>
+    <div class="notfilter clickable" ng-hide="inFilter" ng-click="addFilter('in')"> + in</div>
+    <div class="filter clickable" ng-hide="!outFilter" ng-click="removeFilter('out')"> x out</div>
+    <div class="notfilter clickable" ng-hide="outFilter" ng-click="addFilter('out')"> + out</div>
+    <div class="filter clickable" ng-hide="!upFilter" ng-click="removeFilter('up')"> x up</div>
+    <div class="notfilter clickable" ng-hide="upFilter" ng-click="addFilter('up')"> + up</div>
+    <div class="filter clickable" ng-hide="!downFilter" ng-click="removeFilter('down')"> x down</div>
+    <div class="notfilter clickable" ng-hide="downFilter" ng-click="addFilter('down')"> + down</div>
+</div>
+<br>
+<div id="datePanel"><br>Date : {{date | date:'HH:mm:ss'}} - matching: {{count}} of {{nbOsd}} OSD</div>
+
+
+<div id="osds" >
+    <div ng-repeat="osd in data|orderBy:'id'" class=" tooltips osd {{osdClass(osd)}}">
+        <div ng-click="osdSelect(osd);">
+            {{osd.id}}
+            <div> <!-- tooltip -->
+                <span>
+                    <strong>osd.{{osd.id}}</strong><br>
+                    {{osdState(osd)}}<br>
+                    <br>
+                    weight : {{osd.weight}}<br>
+                    public addr : {{osd.public_addr}}<br>
+                    cluster addr : {{osd.cluster_addr}}<br>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html ng-app="PoolPgOsdApp" xmlns="http://www.w3.org/1999/html">
+<html ng-app="PoolPgOsdApp">
 <head>
     <meta charset=utf-8/>
     <title>Pools / PGs / OSDs</title>
@@ -8,13 +8,20 @@
     <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/tooltip.css"/>
     <script src="scripts/angular/angular.min.js"></script>
+    <script src="scripts/angular/angular-sanitize.min.js"></script>
+    <script src="scripts/angular-misc/ng-table.min.js"></script>
+    <script src="scripts/angular-misc/angular-commons.js"></script>
+    <script src="scripts/angular-misc/ui-bootstrap-tpls-0.10.0.min.js"></script>
+    <script src="scripts/angular-misc/dialogs.v2.min.js"></script>
     <script src="scripts/poolPgOsdApp.js"></script>
     <script src="scripts/d3/d3.v3.min.js"></script>
     <script src="scripts/d3/sankey.js"></script>
     <script src="scripts/d3/common.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
     <style>
         .node rect {
-            cursor: move;
+            cursor: pointer;
             fill-opacity: .9;
             shape-rendering: crispEdges;
         }
@@ -31,7 +38,7 @@
         }
 
         .link:hover {
-            stroke-opacity: .5;
+            stroke-opacity: 1.0;
         }
 
         #chart1, #chart2 {
@@ -64,7 +71,8 @@
     <![endif]-->
 </head>
 <body ng-controller="poolPgOsdCtrl">
-<h1 class="pageTitle"><a href="index.html"><img src="img/inkscope_logo100.png" boredr="0"></a> Pools / PGs / OSDs</h1>
+
+<header ng-include src="'partials/header.html'" ng-init="pageTitle='Pools / PGs / OSDs'"></header>
 
 <form ng-submit="changePeriod()">
     <div id="controlPanel">
@@ -74,9 +82,8 @@
     </div>
 </form>
 <div id="datePanel">Date : {{date | date:'HH:mm:ss'}}</div>
-<p id="chart1">
 
-<p id="chart2">
+<p id="chart">
 
 </p>
 </body>
