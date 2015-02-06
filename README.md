@@ -5,18 +5,17 @@ InkScope-lite is a simplified version of [inkScope](https://github.com/inkscope/
 
 It allows only visualization of a Ceph cluster.
 
-It doesn't use probe or database but only the ceph-rest-api to communicate with Ceph.
+Inkscope-lite only needs [Apache 2](http://httpd.apache.org/) et a running ceph-rest-api on the Ceph cluster.
 
-# prequisites
-Inkscope needs [Apache 2](http://httpd.apache.org/) et a running ceph-rest-api on the Ceph cluster.
-
-Download all the directories of the inkScope-lite project to a folder of your choice
+There is no database, no server, no probes.
 
 _in the following stages, we have chosen /var/www/inkscope-lite_
 
 # Installation
 
 ## Installation of inkscope-lite
+
+Download all the directories of the inkScope-lite project to a folder of your choice
 
 Apache V2 is already installed
 
@@ -68,6 +67,8 @@ Apache V2 is already installed
         sudo a2ensite inkscope-lite
 
     No need to restart Apache
+
+Et voilà !
 
 #Screenshots
 
