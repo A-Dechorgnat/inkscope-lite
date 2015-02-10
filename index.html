@@ -267,35 +267,35 @@
 </div>
 <div id="osd_status" ng-show="viewOsdModule" class="animate-show">
     <i class="icon-remove closeButton" title="hide" alt="hide" ng-click="showModule('viewOsdModule',false)" style="float:right"></i>
-    <h2>{{osdsUp + osdsDown}} OSD </h2>
+    <h2 onclick="document.location='osds.html'" class="clickable ng-binding">{{osdsUp + osdsDown}} OSD </h2>
     <div id="osd_status_details">
         <table style="float: right">
-            <tr>
-                <td><div >UP</div></td>
-                <td><div >DOWN</div></td>
+            <tr class="clickable">
+                <td><div onclick="document.location='osds.html?state=up'" >UP</div></td>
+                <td><div onclick="document.location='osds.html?state=down'" >DOWN</div></td>
             </tr>
             <tr>
                 <td>
-                    <div class="health_status_HEALTH_OK mybadge" >{{osdsUp}}</div>
+                    <div class="health_status_HEALTH_OK mybadge" onclick="document.location='osds.html?state=up'" >{{osdsUp}}</div>
                 </td>
                 <td>
-                    <div class={{badgeClass("ERR",osdsInDown)}} >
+                    <div class={{badgeClass("ERR",osdsInDown)}} onclick="document.location='osds.html?state=down'">
                         {{osdsDown}}
                     </div>
                 </td>
             </tr>
             <tr>
-                <td><div >IN</div></td>
-                <td><div >OUT</div></td>
+                <td><div onclick="document.location='osds.html?state=in'">IN</div></td>
+                <td><div onclick="document.location='osds.html?state=out'">OUT</div></td>
             </tr>
             <tr>
                 <td>
-                    <div class={{badgeClass("WARN",osdsOutUp)}} >
+                    <div class={{badgeClass("WARN",osdsOutUp)}}  onclick="document.location='osds.html?state=in'">
                         {{osdsIn}}
                     </div>
                 </td>
                 <td>
-                    <div class={{badgeClass("WARN",osdsOutDown)}}>
+                    <div class={{badgeClass("WARN",osdsOutDown)}} onclick="document.location='osds.html?state=out'">
                         {{osdsOut}}
                     </div>
                 </td>
