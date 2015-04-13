@@ -10,6 +10,9 @@ StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookie
     $scope.journal = [];
     $scope.osdControl =0;
 
+    $scope.refreshPG = true;
+    $scope.refreshPGcontrolClass = "icon-pause";
+
     $scope.viewControlPanel = false;
     $scope.viewMonitorModule = testAndSetCookie('viewMonitorModule',true);
     $scope.viewCapacityModule = testAndSetCookie('viewCapacityModule',true);
@@ -106,7 +109,8 @@ StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookie
                 $scope.mdsmap = data.output.mdsmap;
                 $scope.mdsmap.up_standby = data.output.mdsmap["up:standby"];
                 $scope.percentUsed = $scope.pgmap.bytes_used / $scope.pgmap.bytes_total;
-                $scope.pgsByState = $scope.pgmap.pgs_by_state;
+
+                if ($scope.refreshPG) $scope.pgsByState = $scope.pgmap.pgs_by_state;
 
                 $scope.read = (data.output.pgmap.read_bytes_sec ? data.output.pgmap.read_bytes_sec : 0);
                 $scope.write = (data.output.pgmap.write_bytes_sec ? data.output.pgmap.write_bytes_sec : 0);
@@ -191,6 +195,14 @@ StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookie
                 $scope.health.severity = "HEALTH_WARN";
                 $scope.health.summary = "Status not available";
             });
+    }
+
+    $scope.refreshPGcontrol = function(){
+        $scope.refreshPG = !$scope.refreshPG;
+        if ($scope.refreshPG)
+            $scope.refreshPGcontrolClass = "icon-pause";
+        else
+            $scope.refreshPGcontrolClass = "icon-play";
     }
 
     $scope.badgeClass = function (type, count) {
