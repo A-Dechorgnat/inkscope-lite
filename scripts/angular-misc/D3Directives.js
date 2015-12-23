@@ -103,7 +103,7 @@ angular.module('D3Directives', [])
                             if (d.name == "fond")return d.color; else return colorFunc(d.value);
                         });
                     path.enter().append("svg:path");
-                    var duration = 1500;
+                    var duration = 1000;
                     if (!animated){
                         duration = 0;
                     }
@@ -121,19 +121,20 @@ angular.module('D3Directives', [])
                         .enter()
                         .append("text")
                         .text(function (d) {
-                            return (d.value * 100).toFixed(1) + " %";
+                            if (d.valid) return (d.value * 100).toFixed(1) + " %";
+                            else return "N/A"
                         })
                         .style("text-anchor", "middle")
                         .style("font-size", fontSize + "px")
                         .style("font-family", "arial");
                     if (animated){
                         gaugeText.transition()
-                        .duration(1500)
+                        .duration(duration)
                         .tween("text", function (d) {
                             var i = d3.interpolate(d.previous, d.value);
                             return function (t) {
                                 if (d.valid) this.textContent = (i(t) * 100).toFixed(1) + " %";
-                                else this.textContent = "invalid";
+                                else this.textContent = "N/A";
                             };
                         });
                     }
@@ -205,6 +206,7 @@ angular.module('D3Directives', [])
 
                         nv.utils.windowResize(chart.update);
 
+
                         return chart;
                     });
                     // link to view pg with state
@@ -214,5 +216,61 @@ angular.module('D3Directives', [])
             }
 
         }
+    })
+    .directive('adPiePools', function () {
+        return {
+            restrict: 'EA',
+            terminal: true,
+            scope: {
+                value: '=',
+                width: "=",
+                labelfield: "=",
+                id: "=",
+                url:"="
+            },
+            link: function (scope, element, attrs) {
+                console.log("enter directive  adPiePools : " + attrs.id);
+
+                var width = parseInt(attrs.width),
+                    height = width;
+
+                var svg = d3.select("#" + attrs.id)
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                scope.$watch('value', function (newValue, oldValue) {
+                    // if 'newValue' is undefined, exit
+                    if ("" + newValue == "undefined") return;
+                    nv.addGraph(function () {
+                        var chart = nv.models.pieChart()
+                            .x(function (d) {
+                                return d['name']+": " + funcBytes(d['stats']['bytes_used']);
+                            })
+                            .y(function (d) {
+                                return d['stats']['bytes_used']
+                            })
+                            .width(width)
+                            .height(height)
+                            .showLabels(true)
+                            .showLegend(false)
+                            .tooltips(false)
+                            .labelType("key");
+
+                        d3.select("#" + attrs.id + " svg")
+                            .datum(newValue)
+                            .transition().duration(1200)
+                            .call(chart);
+                        nv.utils.windowResize(chart.update);
+                        return chart;
+                    });
+                    // link to view pool
+                    var path = d3.selectAll("#" + attrs.id + " path")
+                        .on('click',function(d){document.location="#detail/"+d.data.id;});
+                });
+            }
+
+        }
     });
 ;
+
