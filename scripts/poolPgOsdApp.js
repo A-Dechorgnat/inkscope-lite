@@ -85,7 +85,7 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $location, $wi
 
     function refreshData() {
         $scope.date = new Date();
-        $http({method: "get", url: apiURL + "pg/stat.json"})
+        $http({method: "get", url: apiURL + "pg/dump_json?dumpcontents=pgs"})
             .success(function (data, status) {
                 var nodeUid = 0;
                 // fetching pg list and relation with osd
