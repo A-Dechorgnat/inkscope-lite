@@ -81,6 +81,25 @@
             bottom: 0;
             width: 40px;
         }
+   #chart_container_op {
+        position: relative;
+        width: 350px;
+            height: 50px;
+            font-family: Arial, Helvetica, sans-serif;
+            float:right;
+        text-align: center;
+        font-size: .85em;
+        }
+   #opchart {
+            position: relative;
+            left: 40px;
+        }
+   #y_axis_op {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+        }
     #menu {
         list-style: none;
         margin: 0;
@@ -137,6 +156,11 @@
         <div id="y_axis"></div>
         <div id="iopschart"></div>
         Read : {{ read | bytes:kB }}/s , Write : {{ write | bytes:kB }} , Recovery : {{ recovery | bytes:kB }}/s
+    </div>
+    <div id="chart_container_op">
+        <div id="y_axis_op"></div>
+        <div id="opchart"></div>
+	Read_op : {{ read_op }}/s, Write_op : {{ write_op }}/s
     </div>
     <h2>Cluster health at {{date | date:'HH:mm:ss'}}</h2>
     <div class="health_summary health_status_{{health.severity}}">
