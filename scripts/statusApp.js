@@ -57,6 +57,32 @@ StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookie
     yAxis.render();
     graph.render();
 
+    var graph_op = new Rickshaw.Graph( {
+        element: document.getElementById("opchart"),
+        width: 300,
+        height: 30,
+        renderer: 'line',
+        series: new Rickshaw.Series.FixedDuration([{ name: 'read_op' },{ name: 'write_op' }], undefined, {
+            timeInterval: 3000,
+            maxDataPoints: 100,
+            timeBase: new Date().getTime() / 1000
+        })
+    } );
+    var hoverDetail_op = new Rickshaw.Graph.HoverDetail( {
+        graph: graph_op,
+        xFormatter: function(x) { return  ""; },
+        yFormatter: function(y) { return  y + "/s" ;}
+    } );
+    var yAxis_op = new Rickshaw.Graph.Axis.Y({
+        graph: graph_op,
+        height: 30,
+        orientation: 'left',
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('y_axis_op')
+    });
+    yAxis_op.render();
+    graph_op.render();
+
     //refresh data every x seconds
     refreshData();
     refreshPGData();
@@ -121,11 +147,19 @@ StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookie
                 $scope.read = (data.output.pgmap.read_bytes_sec ? data.output.pgmap.read_bytes_sec : 0);
                 $scope.write = (data.output.pgmap.write_bytes_sec ? data.output.pgmap.write_bytes_sec : 0);
                 $scope.recovery = (data.output.pgmap.recovering_bytes_per_sec ? data.output.pgmap.recovering_bytes_per_sec : 0);
+                $scope.read_op = (data.output.pgmap.read_op_per_sec ? data.output.pgmap.read_op_per_sec : 0);
+                $scope.write_op = (data.output.pgmap.write_op_per_sec ? data.output.pgmap.write_op_per_sec : 0);
 
                 var iopsdata = { read: $scope.read , write : $scope.write , recovery : $scope.recovery };
+                var opdata = { read_op: $scope.read_op, write_op : $scope.write_op };
+
                 graph.series.addData(iopsdata);
                 yAxis.render();
                 graph.render();
+
+                graph_op.series.addData(opdata);
+                yAxis.render();
+                graph_op.render();
 
                 $scope.health = {};
                 $scope.health.severity = data.output.health.overall_status;
